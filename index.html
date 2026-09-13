@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Generador de horarios con asignación de aulas y docentes.">
+  <title>Horarios</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" href="assets/Chava.png">
+</head>
+<body>
+<a class="skip-link" href="#app">Saltar al cuestionario</a>
+<header class="topbar" id="inicio">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="#inicio" aria-label="Horarios, inicio">
+      <img class="brand-logo" src="assets/Chava.png" width="44" height="44" alt="Chava">
+      <span>
+        <strong>Horarios</strong>
+        <small>Distribuidor para control escolar</small>
+      </span>
+    </a>
+    <div class="top-actions">
+      <button class="btn secondary" id="loadDemo" type="button">Cargar ejemplo</button>
+      <button class="btn secondary" id="backup" type="button">Respaldo JSON</button>
+      <label class="btn secondary file-label" for="restore">Restaurar JSON</label>
+      <input id="restore" type="file" accept="application/json,.json" hidden>
+      <button class="btn danger" id="reset" type="button">Borrar datos</button>
+    </div>
+  </div>
+  <div class="save-line"><span id="saveState">Guardado local activado</span></div>
+</header>
+<nav class="stepbar" aria-label="Secciones del cuestionario">
+  <div class="wrap">
+    <div id="steps" class="steps"></div>
+    <div class="progress">
+      <span id="progress"></span>
+    </div>
+  </div>
+</nav>
+<main id="app" class="wrap app" tabindex="-1">
+  <noscript>
+    <div class="notice error">Esta aplicación requiere JavaScript habilitado.</div>
+  </noscript>
+
+  <section class="panel step" data-title="Escuela">
+    <header class="section-head">
+      <span class="eyebrow">Sección 1</span>
+      <h1>Generalidades.</h1>
+      <p>Definición de la malla semanal de todos los horarios.</p>
+    </header>
+    <div class="form-grid two">
+      <label class="field wide">
+        <span>Nombre de la escuela</span>
+        <input id="schoolName" required placeholder="Ej. Instituto Tecnológico de Tlaxcala">
+      </label>
+      <label class="field">
+        <span>Ciclo escolar</span>
+        <input id="cycle" placeholder="Ej. Otoño 2026">
+      </label>
+      <fieldset class="field wide">
+        <legend>Días con clases</legend>
+        <div id="days" class="chips"></div>
+      </fieldset>
+      <label class="field">
+        <span>Hora de inicio</span>
+        <input id="startTime" type="time" step="900">
+      </label>
+      <label class="field">
+        <span>Hora de salida</span>
+        <input id="endTime" type="time" step="900">
+      </label>
+      <label class="field">
+        <span>Duración de módulos</span>
+        <select id="duration">
+        <option>30</option>
+        <option>40</option>
+        <option>45</option>
+        <option>50</option>
+        <option selected>60</option>
+        <option>90</option>
+        <option>120</option>
+      </select>
+      <small>Minutos por módulo.</small>
+    </label>
+      <label class="field">
+        <span>Máximo de módulos continuos</span>
+        <input id="maxContinuous" type="number" min="1" max="8" value="2">
+        <small>De una misma materia.</small>
+      </label>
+    </div>
+    <div class="subsection">
+      <div class="subhead">
+        <div>
+          <h2>Recesos</h2>
+          <p>Módulos que no deben recibir clases.</p>
+        </div>
+      </div>
+      <div id="breaks" class="check-list"></div>
+    </div>
+    <div id="gridSummary" class="notice"></div>
+  </section>
+
+  <section class="panel step" data-title="Aulas" hidden>
+    <header class="section-head">
+      <span class="eyebrow">Sección 2</span>
+      <h1>Aulas disponibles</h1>
+      <p>Registra cuales son los salones, su capacidad y tipo. Estas serán las limitaciones para la distribución.</p>
+    </header>
+    <form id="roomForm" class="inline-form">
+      <input id="roomName" required placeholder="Nombre del aula" aria-label="Nombre o número del salón">
+      <input id="roomCapacity" required type="number" min="1" placeholder="Capacidad" aria-label="Capacidad máxima">
+      <select id="roomType" aria-label="Tipo de aula">
+        <option>Salón</option>
+        <option>Centro de cómputo</option>
+        <option>Laboratorio</option>
+        <option>Anexo</option>
+        <option>Taller</option>
+      </select>
+      <button class="btn primary" type="submit">Agregar salón</button>
+    </form>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Aula</th>
+            <th>Capacidad</th>
+            <th>Tipo</th>
+            <th></th>
+          </tr>
+        </thead>
+          <tbody id="roomRows"></tbody>
+        </table>
+      </div>
+    <div id="roomEmpty" class="empty">
+      <strong>Aún no hay salones.</strong>
+      <span>Agrega el primer salón para continuar.</span>
+    </div>
+  </section>
+
+  <section class="panel step" data-title="Materias" hidden>
+    <header class="section-head">
+      <span class="eyebrow">Sección 3</span>
+      <h1>Catálogo de materias</h1>
+      <p>A cada materia se le asignará el mismo color y será para un solo docente.</p>
+    </header>
+    <form id="subjectForm" class="inline-form subject-form">
+      <input id="subjectName" required placeholder="Nombre de la materia" aria-label="Nombre de la materia">
+      <input id="subjectCode" placeholder="Clave" aria-label="Clave de la materia">
+      <input id="subjectColor" type="color" value="#5b8cff" aria-label="Color de la materia">
+      <select id="subjectSpace" aria-label="Espacio requerido">
+        <option value="">Cualquier salón</option>
+        <option>Centro de cómputo</option>
+        <option>Laboratorio</option>
+        <option>Anexo</option>
+        <option>Taller</option>
+      </select>
+      <input id="subjectMax" type="number" min="1" max="8" placeholder="Máx. continuos" aria-label="Máximo continuo particular">
+      <button class="btn primary" type="submit">Agregar materia</button>
+    </form>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Materia</th>
+            <th>Clave</th>
+            <th>Color</th>
+            <th>Salón</th>
+            <th>Máx.</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="subjectRows"></tbody>
+      </table>
+    </div>
+    <div id="subjectEmpty" class="empty">
+      <strong>Aún no hay materias.</strong>
+      <span>Agrega el catálogo antes de registrar grupos.</span>
+    </div>
+  </section>
+
+  <section class="panel step" data-title="Grupos" hidden>
+    <header class="section-head">
+      <span class="eyebrow">Sección 4</span>
+      <h1>Grupos y carga de materias</h1>
+      <p>Relaciona cada grupo con sus materias y horas necesarias por semana.</p>
+    </header>
+    <form id="groupForm" class="card-form">
+      <div class="form-grid three">
+        <input id="groupFaculty" required placeholder="Facultad" aria-label="Facultad">
+        <input id="groupDegree" required placeholder="Semestre" aria-label="Semestre">
+        <input id="groupCareer" required placeholder="Carrera o licenciatura" aria-label="Carrera o licenciatura">
+        <input id="groupCode" required placeholder="Clave del grupo, ej. 3° A" aria-label="Clave del grupo">
+        <input id="groupStudents" required type="number" min="1" placeholder="Total de alumnos" aria-label="Total de alumnos">
+        <select id="groupRoom" aria-label="Aula base"><option value="">Aula base automática</option></select>
+        <input id="groupShift" placeholder="Turno (opcional)" aria-label="Turno">
+      </div>
+      <div class="subsection flat"><div class="subhead">
+        <div>
+          <h2>Materias del grupo</h2>
+          <p>Marca las materias y captura horas semanales.</p>
+        </div>
+      </div>
+      <div id="groupSubjects" class="subject-picker"></div>
+    </div>
+      <button class="btn primary" type="submit">Guardar grupo</button>
+      <button class="btn secondary" id="cancelGroup" type="button" hidden>Cancelar edición</button>
+    </form>
+    <div id="groupCards" class="cards"></div>
+    <div id="groupEmpty" class="empty">
+      <strong>Aún no hay grupos.</strong>
+      <span>El proyecto está preparado para manejar hasta 30 grupos.</span>
+    </div>
+  </section>
+
+  <section class="panel step" data-title="Docentes" hidden>
+    <header class="section-head">
+      <span class="eyebrow">Sección 5</span>
+      <h1>Docentes y disponibilidad</h1>
+      <p>Selecciona materias y pinta la disponibilidad en la tabla por día y módulo.</p>
+    </header>
+    <form id="teacherForm" class="card-form">
+      <div class="form-grid three">
+        <input id="teacherName" required placeholder="Nombre del docente" aria-label="Nombre del docente">
+        <label class="field">
+          <span>Máx. módulos al día</span>
+          <input id="teacherDayMax" type="number" min="1" value="6">
+        </label>
+        <label class="field">
+          <span>Máx. módulos por semana</span>
+          <input id="teacherWeekMax" type="number" min="1" value="30">
+        </label>
+      </div>
+      <fieldset class="field">
+        <legend>Materias que puede o va a dar</legend>
+        <div id="teacherSubjects" class="chips"></div>
+      </fieldset>
+      <div class="subsection flat">
+        <div class="subhead availability-head">
+        <div>
+          <h2>Disponibilidad semanal</h2>
+          <p>Haz clic o arrastra. Verde = disponible; gris = no disponible.</p>
+        </div>
+      <div>
+        <button class="btn secondary small" id="allAvailable" type="button">Todo disponible</button>
+        <button class="btn secondary small" id="noneAvailable" type="button">Limpiar</button>
+      </div>
+    </div>
+    <div id="availability" class="availability-wrap"></div>
+  </div>
+      <button class="btn primary" type="submit">Guardar docente</button>
+      <button class="btn secondary" id="cancelTeacher" type="button" hidden>Cancelar edición</button>
+    </form>
+    <div id="teacherCards" class="cards"></div><div id="teacherEmpty" class="empty">
+      <strong>Aún no hay docentes.</strong>
+      <span>Agrega disponibilidad y materias para realizar la asignación.</span>
+    </div>
+  </section>
+
+  <section class="panel step" data-title="Compartidas" hidden>
+    <header class="section-head">
+      <span class="eyebrow">Sección 6</span>
+      <h1>Materias compartidas</h1>
+      <p>Junta dos o más grupos en una sesión. El aula se seleccionará por la suma de alumnos.</p>
+    </header>
+    <form id="mergeForm" class="card-form">
+      <label class="field">
+        <span>Materia compartida</span>
+        <select id="mergeSubject" required></select>
+      </label>
+      <fieldset class="field">
+        <legend>Grupos participantes</legend>
+        <div id="mergeGroups" class="chips"></div>
+      </fieldset>
+      <button class="btn primary" type="submit">Agregar sesión compartida</button>
+    </form>
+    <div id="mergeCards" class="cards compact"></div>
+    <div id="mergeEmpty" class="empty">
+      <strong>No hay sesiones compartidas.</strong>
+      <span>Es opcional; los grupos pueden tener horarios independientes.</span>
+    </div>
+  </section>
+
+  <section class="panel step" data-title="Generar" hidden>
+    <header class="section-head">
+      <span class="eyebrow">Sección 7</span>
+      <h1>Validar y generar</h1>
+      <p>Revisa la información y realiza una distribución equilibrada.</p>
+    </header>
+    <div id="validation" class="validation-list"></div>
+    <div class="generate-box">
+      <div>
+        <h2>Motor de horarios</h2>
+        <p>Prioriza equilibrio entre días, reduce horas libres y respeta la capacidad de los salones, disponibilidad y continuidad.</p>
+      </div>
+      <button id="generate" class="btn primary large" type="button">Generar horarios</button>
+    </div>
+    <div id="generationResult"></div>
+  </section>
+
+  <section class="panel step" data-title="Vista previa" hidden>
+    <header class="section-head preview-head">
+      <div>
+        <span class="eyebrow">Sección 8</span>
+        <h1>Vista previa y esportar a Excel</h1>
+        <p>Consulta por grupo, docente o aula antes de descargar el libro.</p>
+      </div>
+      <button id="exportXlsx" class="btn success" type="button">Exportar XLSX</button>
+    </header>
+    <div class="segmented" role="tablist" aria-label="Vista del horario">
+      <button class="active" data-view="groups" role="tab">Grupos</button>
+      <button data-view="teachers" role="tab">Docentes</button>
+      <button data-view="rooms" role="tab">Aulas</button>
+    </div>
+    <div id="legend" class="legend"></div>
+    <div id="preview"></div>
+  </section>
+
+  <div class="pager">
+    <button class="btn secondary" id="prev" type="button">← Anterior</button>
+    <span id="position"></span><button class="btn primary" id="next" type="button">Siguiente →</button>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap footer-grid">
+    <div>
+      <a class="brand footer-brand" href="#inicio">
+      <img class="brand-logo" src="assets/Chava.png" width="44" height="44" alt="Chava">
+      <span>Horarios</span>
+      </a>
+      <p>Asistente para distribuir clases, aulas y docentes.</p>
+    </div>
+    <div>
+      <b>Enlaces</b>
+      <a href="README.md">Documentación</a>
+    </div>
+    <div>
+      <b>Redes y contacto</b>
+      <a href="https://github.com/Mini-Buda-CH" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <a href="https://www.instagram.com/eldragondelcuento?stkn=MTExbDN1czFzYXduZg==" target="_blank" rel="noopener noreferrer">Instagram</a>
+      <a href="mailto:smolina.co@gmail.com">Contacto</a>
+    </div>
+    <div class="logo-placeholder">
+      <img src="assets/Chava.png" alt="Chava" width="200" height="200" loading="lazy" decoding="async">
+    </div>
+  </div>
+  <div class="wrap legal">
+    <span>© <span id="year"></span> Salvador Molina Corona. Contenido educativo.</span>
+      <span>Privacidad local · Accesible · Responsive</span>
+    </div>
+</footer>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script src="vendor/xlsx-js-style.min.js"></script>
+<script src="js/store.js"></script>
+<script src="js/scheduler.js"></script>
+<script src="js/export.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
