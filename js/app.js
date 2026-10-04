@@ -30,6 +30,11 @@ function go(n){
         $('#prev').disabled=step===0;
         $('#next').hidden=step===steps.length-1;
         $('#position').textContent=(step+1)+' de '+steps.length;
+        const bar=$('#steps'),tab=$$('.step-tab')[step];
+        if(tab)bar.scrollTo({
+            left:tab.offsetLeft-bar.offsetLeft-(bar.clientWidth-tab.offsetWidth)/2,
+            behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'
+        });
     if(step===6)renderValidation();
     if(step===7)renderPreview();
         scrollTo({
