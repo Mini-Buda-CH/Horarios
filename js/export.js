@@ -3,19 +3,19 @@ const argb=h=>'FF'+String(h||'#000000').replace('#','').toUpperCase();
 const border={
     top:{
         style:'thin',
-        color:{rgb:'FF303641'}
+        color:{rgb:'FF333333'}
     },
     bottom:{
         style:'thin',
-        color:{rgb:'FF303641'}
+        color:{rgb:'FF333333'}
     },
     left:{
         style:'thin',
-        color:{rgb:'FF303641'}
+        color:{rgb:'FF333333'}
     },
     right:{
         style:'thin',
-        color:{rgb:'FF303641'}
+        color:{rgb:'FF333333'}
     }
 };
 const styles={
@@ -26,25 +26,25 @@ const styles={
             sz:18
         },
         fill:{
-            fgColor:{rgb:'FF0B0D11'}
+            fgColor:{rgb:'FF000000'}
         },
         alignment:{vertical:'center'}
     },
     subtitle:{
         font:{
-            color:{rgb:'FFAAB2C1'},
+            color:{rgb:'FFB3B3B3'},
             sz:11},
             fill:{
-                fgColor:{rgb:'FF0B0D11'}
+                fgColor:{rgb:'FF000000'}
             }
         },
         section:{
             font:{
                 bold:true,
-                color:{rgb:'FFFFFFFF'},
+                color:{rgb:'FF1ED760'},
                 sz:12},
                 fill:{
-                    fgColor:{rgb:'FF1C2029'}
+                    fgColor:{rgb:'FF1F1F1F'}
                 },
                 alignment:{
                     vertical:'center'
@@ -56,7 +56,7 @@ const styles={
                 color:{rgb:'FFFFFFFF'}
             },
             fill:{
-                fgColor:{rgb:'FF161920'}
+                fgColor:{rgb:'FF1F1F1F'}
             },
             alignment:{
                 horizontal:'center',
@@ -68,10 +68,10 @@ const styles={
         label:{
             font:{
                 bold:true,
-                color:{rgb:'FFAAB2C1'}
+                color:{rgb:'FFB3B3B3'}
             },
             fill:{
-                fgColor:{rgb:'FF101217'}
+                fgColor:{rgb:'FF121212'}
             },
             border
         },
@@ -80,17 +80,17 @@ const styles={
                 color:{rgb:'FFFFFFFF'}
             },
             fill:{
-                fgColor:{rgb:'FF101217'}
+                fgColor:{rgb:'FF121212'}
             },
             border
         },
         time:{
             font:{
-                color:{rgb:'FFAAB2C1'},
+                color:{rgb:'FFB3B3B3'},
                 sz:10
             },
             fill:{
-                fgColor:{rgb:'FF101217'}
+                fgColor:{rgb:'FF121212'}
             },
             alignment:{
                 horizontal:'center',
@@ -101,10 +101,10 @@ const styles={
         },
         free:{
             font:{
-                color:{rgb:'FF747E90'}
+                color:{rgb:'FF767676'}
             },
             fill:{
-                fgColor:{rgb:'FF0D0F13'}
+                fgColor:{rgb:'FF000000'}
             },
             alignment:{
                 horizontal:'center',
@@ -115,10 +115,10 @@ const styles={
         break:{
             font:{
                 bold:true,
-                color:{rgb:'FFF1BD4E'}
+                color:{rgb:'FFB3B3B3'}
             },
             fill:{
-                fgColor:{rgb:'FF251D0A'}
+                fgColor:{rgb:'FF121212'}
             },
             alignment:{
                 horizontal:'center',
@@ -129,11 +129,11 @@ const styles={
         footer:{
             font:{
                 italic:true,
-                color:{rgb:'FF747E90'},
+                color:{rgb:'FF767676'},
                 sz:9
             },
             fill:{
-                fgColor:{rgb:'FF0B0D11'}
+                fgColor:{rgb:'FF000000'}
             },
             alignment:{
                 horizontal:'center'}

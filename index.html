@@ -7,7 +7,7 @@
   <title>Horarios</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
   <link rel="icon" href="assets/Chava.png">
 </head>
@@ -23,9 +23,9 @@
       </span>
     </a>
     <div class="top-actions">
-      <button class="btn secondary" id="loadDemo" type="button">Cargar ejemplo</button>
-      <button class="btn secondary" id="backup" type="button">Respaldo JSON</button>
-      <label class="btn secondary file-label" for="restore">Restaurar JSON</label>
+      <button class="btn ghost" id="loadDemo" type="button">Cargar ejemplo</button>
+      <button class="btn ghost" id="backup" type="button">Respaldo JSON</button>
+      <label class="btn ghost file-label" for="restore">Restaurar JSON</label>
       <input id="restore" type="file" accept="application/json,.json" hidden>
       <button class="btn danger" id="reset" type="button">Borrar datos</button>
     </div>
@@ -206,7 +206,7 @@
       <div id="groupSubjects" class="subject-picker"></div>
     </div>
       <button class="btn primary" type="submit">Guardar grupo</button>
-      <button class="btn secondary" id="cancelGroup" type="button" hidden>Cancelar edición</button>
+      <button class="btn ghost" id="cancelGroup" type="button" hidden>Cancelar edición</button>
     </form>
     <div id="groupCards" class="cards"></div>
     <div id="groupEmpty" class="empty">
@@ -244,14 +244,14 @@
           <p>Haz clic o arrastra. Verde = disponible; gris = no disponible.</p>
         </div>
       <div>
-        <button class="btn secondary small" id="allAvailable" type="button">Todo disponible</button>
-        <button class="btn secondary small" id="noneAvailable" type="button">Limpiar</button>
+        <button class="btn ghost small" id="allAvailable" type="button">Todo disponible</button>
+        <button class="btn ghost small" id="noneAvailable" type="button">Limpiar</button>
       </div>
     </div>
     <div id="availability" class="availability-wrap"></div>
   </div>
       <button class="btn primary" type="submit">Guardar docente</button>
-      <button class="btn secondary" id="cancelTeacher" type="button" hidden>Cancelar edición</button>
+      <button class="btn ghost" id="cancelTeacher" type="button" hidden>Cancelar edición</button>
     </form>
     <div id="teacherCards" class="cards"></div><div id="teacherEmpty" class="empty">
       <strong>Aún no hay docentes.</strong>
@@ -276,7 +276,7 @@
       </fieldset>
       <button class="btn primary" type="submit">Agregar sesión compartida</button>
     </form>
-    <div id="mergeCards" class="cards compact"></div>
+    <div id="mergeCards" class="cards"></div>
     <div id="mergeEmpty" class="empty">
       <strong>No hay sesiones compartidas.</strong>
       <span>Es opcional; los grupos pueden tener horarios independientes.</span>
@@ -319,8 +319,8 @@
   </section>
 
   <div class="pager">
-    <button class="btn secondary" id="prev" type="button">← Anterior</button>
-    <span id="position"></span><button class="btn primary" id="next" type="button">Siguiente →</button>
+    <button class="btn ghost" id="prev" type="button">← Anterior</button>
+    <span id="position"></span><button class="btn secondary" id="next" type="button">Siguiente →</button>
   </div>
 </main>
 
